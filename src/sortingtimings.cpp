@@ -7,108 +7,151 @@
 using namespace std;
 
 void SortingTimings::merge(vector<int>& mergeVec, int start, int mid, int end) {
+    // Create temporary vectors to hold the left and right subarrays
     vector<int> left(mergeVec.begin() + start, mergeVec.begin() + mid + 1);
     vector<int> right(mergeVec.begin() + mid + 1, mergeVec.begin() + end + 1);
 
+    // Indices for traversing the left, right subarrays and the main vector
     int i = 0, j = 0, k = start;
+
+    // Merge the two subarrays (left and right) into the original array (mergeVec)
     while (i < left.size() && j < right.size()) {
         if (left[i] <= right[j]) {
-            mergeVec[k] = left[i];
-            i++;
+            mergeVec[k] = left[i];  // If left element is smaller, copy it to mergeVec
+            i++;  // Move to the next element in the left subarray
         }
         else {
-            mergeVec[k] = right[j];
-            j++;
+            mergeVec[k] = right[j];  // If right element is smaller, copy it to mergeVec
+            j++;  // Move to the next element in the right subarray
         }
-        k++;
+        k++;  // Move to the next position in the main vector
     }
+
+    // If there are any remaining elements in the left subarray, copy them to mergeVec
     while (i < left.size()) {
-        mergeVec[k] = left[i];
-        i++;
-        k++;
+        mergeVec[k] = left[i];  // Copy remaining left elements
+        i++;  // Move to the next element in the left subarray
+        k++;  // Move to the next position in the main vector
     }
+
+    // If there are any remaining elements in the right subarray, copy them to mergeVec
     while (j < right.size()) {
-        mergeVec[k] = right[j];
-        j++;
-        k++;
+        mergeVec[k] = right[j];  // Copy remaining right elements
+        j++;  // Move to the next element in the right subarray
+        k++;  // Move to the next position in the main vector
     }
 }
 
 void SortingTimings::mergeSort(vector<int>& mergeVec, int start, int end) {
+    // Base case: if the start index is greater than or equal to the end index, the array is already sorted
     if (start >= end) return;
+
+    // Find the middle point of the current range (divide the array)
     int mid = (start + end) / 2;
+
+    // Recursively sort the left half of the array (from start to mid)
     mergeSort(mergeVec, start, mid);
+
+    // Recursively sort the right half of the array (from mid+1 to end)
     mergeSort(mergeVec, mid + 1, end);
+
+    // Merge the two sorted halves into a single sorted array
     merge(mergeVec, start, mid, end);
 }
 
 void SortingTimings::insertionSort(vector<int>& vec) {
-    int n = vec.size();
-    for (int i = 1; i < n; i++) {
-        int key = vec[i];
-        int j = i - 1;
+    int n = vec.size();  // Get the size of the vector
 
+    // Outer loop: Start from the second element and iterate to the last element
+    for (int i = 1; i < n; i++) {
+        int key = vec[i];  // The current element to be inserted into the sorted portion
+        int j = i - 1;  // Index for the sorted portion (elements before the current element)
+
+        // Inner loop: Shift elements larger than 'key' one position to the right
         while (j >= 0 && vec[j] > key) {
-            vec[static_cast<vector<int, allocator<int>>::size_type>(j) + 1] = vec[j];
-            j = j - 1;
+            vec[static_cast<vector<int, allocator<int>>::size_type>(j) + 1] = vec[j];  // Move the larger element to the right
+            j = j - 1;  // Move to the next element in the sorted portion
         }
+
+        // Place the 'key' in the correct position in the sorted portion
         vec[static_cast<vector<int, allocator<int>>::size_type>(j) + 1] = key;
     }
 }
 
 void SortingTimings::bubbleSort(vector<int>& vec) {
-    size_t n = vec.size();
+    size_t n = vec.size();  // Get the size of the vector
 
+    // Outer loop: Repeat the process for each element (n-1 times)
     for (size_t i = 0; i < n - 1; ++i) {
-        bool swapped = false;
+        bool swapped = false;  // Flag to check if any elements were swapped in the inner loop
+
+        // Inner loop: Compare adjacent elements and swap them if they are out of order
         for (size_t j = 0; j < n - 1 - i; ++j) {
-            if (vec[j] > vec[j + 1]) {
-                swap(vec[j], vec[j + 1]);
-                swapped = true;
+            if (vec[j] > vec[j + 1]) {  // If the current element is greater than the next element
+                swap(vec[j], vec[j + 1]);  // Swap them to order them correctly
+                swapped = true;  // Mark that a swap occurred
             }
         }
+
+        // If no elements were swapped during the inner loop, the list is already sorted
         if (!swapped) {
-            break;
+            break;  // Exit the loop early since the list is sorted
         }
     }
 }
 
 void SortingTimings::selectionSort(vector<int>& vec) {
-    size_t n = vec.size();
+    size_t n = vec.size();  // Get the size of the vector
 
+    // Outer loop: Iterate over each element, except the last one
     for (size_t i = 0; i < n - 1; ++i) {
-        size_t minIndex = i;
+        size_t minIndex = i;  // Assume the current element is the smallest
+
+        // Inner loop: Find the smallest element in the unsorted part of the vector
         for (size_t j = i + 1; j < n; ++j) {
             if (vec[j] < vec[minIndex]) {
-                minIndex = j;
+                minIndex = j;  // Update the index of the smallest element
             }
         }
+
+        // If the smallest element is not already in its correct position, swap it
         if (minIndex != i) {
-            swap(vec[i], vec[minIndex]);
+            swap(vec[i], vec[minIndex]);  // Swap the found minimum element with the current element
         }
     }
 }
 
 void SortingTimings::quickSort(vector<int>& vec, int low, int high) {
+    // Base case: if the low index is less than the high index, the subarray is not yet sorted
     if (low < high) {
+        // Partition the array and get the index of the pivot element
         int pivot_index = q_partition(vec, low, high);
+
+        // Recursively apply quickSort to the left subarray (elements before the pivot)
         quickSort(vec, low, pivot_index - 1);
+
+        // Recursively apply quickSort to the right subarray (elements after the pivot)
         quickSort(vec, pivot_index + 1, high);
     }
 }
 
 int SortingTimings::q_partition(vector<int>& vec, int low, int high) {
-    int pivot = vec[high];
-    int i = low - 1;
+    int pivot = vec[high];  // Choose the pivot element (last element in the current range)
+    int i = low - 1;  // Index for the smaller element, initialized to one less than the low index
 
+    // Loop through the elements in the range from low to high - 1
     for (int j = low; j < high; ++j) {
+        // If the current element is less than or equal to the pivot, swap it to the left side
         if (vec[j] <= pivot) {
-            i = i + 1;
-            swap(vec[i], vec[j]);
+            i = i + 1;  // Increment the index for the smaller element
+            swap(vec[i], vec[j]);  // Swap elements to place smaller ones to the left of pivot
         }
     }
+
+    // Place the pivot element in the correct position by swapping it with the element at index i + 1
     swap(vec[static_cast<vector<int, allocator<int>>::size_type>(i) + 1], vec[high]);
 
+    // Return the index of the pivot element after partitioning
     return i + 1;
 }
 
@@ -166,125 +209,129 @@ void SortingTimings::radixSort(vector<int>& vec) {
 }
 
 void SortingTimings::counting_sort_by_digit(vector<int>& vec, int exp) {
-    int n = vec.size();
-    vector<int> output(n);    // Output array to store sorted numbers
-    vector<int> count(10, 0); // Count array for digits 0-9
+    int n = vec.size();  // Get the size of the vector
+    vector<int> output(n);   // Output array to store sorted elements
+    vector<int> count(10, 0); // Counting array to store frequencies of digits (0 to 9)
 
-    // Count occurrences of each digit in the current digit place
+    // Count the occurrences of each digit at the given place value (exp)
     for (int i = 0; i < n; ++i) {
-        int digit = (vec[i] / exp) % 10;
-        count[digit]++;
+        int digit = (vec[i] / exp) % 10;  // Extract the digit at the current place value
+        count[digit]++;  // Increment the count for that digit
     }
 
-    // Convert count[] to a prefix sum array
+    // Compute the cumulative count (position of elements in output array)
     for (int i = 1; i < 10; ++i) {
-        count[i] += count[i - 1];
+        count[i] += count[i - 1];  // Add previous counts to get cumulative counts
     }
 
-    // Build the output array by placing numbers in the correct sorted order
+    // Build the output array by placing the elements in the correct position
     for (int i = n - 1; i >= 0; --i) {
-        int digit = (vec[i] / exp) % 10;
-        output[count[digit] - 1] = vec[i];
-        count[digit]--;
+        int digit = (vec[i] / exp) % 10;  // Extract the digit at the current place value
+        output[count[digit] - 1] = vec[i];  // Place the element at the correct position
+        count[digit]--;  // Decrement the count for that digit
     }
 
-    // Copy the sorted numbers back into the original array
+    // Copy the sorted elements from the output array back to the original vector
     for (int i = 0; i < n; ++i) {
-        vec[i] = output[i];
+        vec[i] = output[i];  // Replace original vector with the sorted output
     }
 }
 
 void SortingTimings::countingSort(vector<int>& vec) {
-    int k = findMax(vec);      // Find maximum value in vec
-    int n = vec.size();        // Size of the input array
-    vector<int> C(k + 1, 0);   // Count array (size k+1)
-    vector<int> B(n);          // Output array
+    int k = findMax(vec);      // Find the maximum value in the vector to determine the range of the counting array
+    int n = vec.size();        // Get the size of the vector
+    vector<int> C(k + 1, 0);   // Create a counting array C, initialized to 0. Size is (k + 1) to accommodate all values up to the max
+    vector<int> B(n);          // Create a temporary array B to store the sorted elements
 
-    // Step 1: Count occurrences of each element
+    // Count the occurrences of each element in the original vector
     for (int i = 0; i < n; ++i) {
-        C[vec[i]]++;
+        C[vec[i]]++;  // Increment the count for the corresponding element in C
     }
 
-    // Step 2: Compute prefix sums in C[]
+    // Calculate the cumulative count in C
     for (int i = 1; i <= k; ++i) {
-        C[i] += C[i - 1];
+        C[i] += C[i - 1];  // Update C[i] to hold the actual position of each element in the sorted array
     }
 
-    // Step 3: Place elements into sorted order (in reverse for stability)
+    // Build the sorted array in B by placing elements in the correct positions
     for (int i = n - 1; i >= 0; --i) {
-        B[C[vec[i]] - 1] = vec[i];
-        C[vec[i]]--;
+        B[C[vec[i]] - 1] = vec[i];  // Place the element in the correct position in B
+        C[vec[i]]--;  // Decrease the count in C for the placed element
     }
 
-    // Step 4: Copy sorted elements back into vec
+    // Copy the sorted array B back into the original vector vec
     for (int i = 0; i < n; ++i) {
-        vec[i] = B[i];
+        vec[i] = B[i];  // Copy the elements from B to the original vector vec
     }
 }
 
 void SortingTimings::bucketSort(vector<int>& vec) {
-    int maxVal = findMax(vec);
-    int n = vec.size();
+    int maxVal = findMax(vec);  // Find the maximum value in the vector
+    int n = vec.size();  // Get the size of the vector
 
-    int numBuckets = sqrt(n);              // Optimal number of buckets
+    // Calculate the number of buckets based on the size of the vector
+    int numBuckets = sqrt(n);
+    // Determine the range of each bucket based on the maximum value
     int bucketRange = ceil((float)maxVal / numBuckets);
 
-    // Step 2: Create buckets
+    // Create the buckets (2D vector of integers)
     vector<vector<int>> buckets(numBuckets);
 
-    // Step 3: Scatter elements into buckets
+    // Distribute the elements of the vector into the corresponding buckets
     for (int x : vec) {
-        int index = x / bucketRange;            // Determine bucket index
-        buckets[index].push_back(x);
+        int index = x / bucketRange;  // Determine the bucket index for the current element
+        buckets[index].push_back(x);  // Place the element into the appropriate bucket
     }
 
-    // Step 4: Sort individual buckets
+    // Sort each individual bucket
     for (auto& bucket : buckets) {
-        sort(bucket.begin(), bucket.end());
+        sort(bucket.begin(), bucket.end());  // Sort elements within each bucket
     }
 
-    // Step 5: Concatenate sorted buckets
-    int k = 0;
+    // Collect the sorted elements back into the original vector
+    int k = 0;  // Index for inserting elements back into the vector
     for (const auto& bucket : buckets) {
         for (int x : bucket) {
-            vec[k++] = x;
+            vec[k++] = x;  // Place each element from the bucket back into the original vector
         }
     }
 }
 
 void SortingTimings::shellSort(vector<int>& vec) {
-    int n = vec.size();
+    int n = vec.size();  // Get the size of the vector
 
-    // Step 1: Initialize the gap
+    // Start with a large gap and reduce it in each iteration
     for (int gap = n / 2; gap > 0; gap /= 2) {
-        // Step 2: Perform gap-based insertion sort
+
+        // Perform a gapped insertion sort for the current gap value
         for (int i = gap; i < n; ++i) {
-            int temp = vec[i];
+            int temp = vec[i];  // Store the current element to be inserted
             int j = i;
 
-            // Compare and shift elements
+            // Shift elements that are greater than temp to the right
             while (j >= gap && vec[j - gap] > temp) {
                 vec[j] = vec[j - gap];
-                j -= gap;
+                j -= gap;  // Move the index by the gap distance
             }
 
-            // Place the temp element in its correct position
+            // Place the stored element (temp) at the correct position
             vec[j] = temp;
         }
     }
 }
 
-void SortingTimings::runAllSorts(){
-    auto startAll = chrono::high_resolution_clock::now();
+void SortingTimings::runAllSorts() {
+    auto startAll = chrono::high_resolution_clock::now();  // Record the start time for all sorting algorithms
 
+    // Measure the execution time of each sorting algorithm
     measureFunc("Selection Sort", [&](vector<int>& vec) { selectionSort(vec); });
     measureFunc("Bubble Sort", [&](vector<int>& vec) { bubbleSort(vec); });
     measureFunc("Insertion Sort", [&](vector<int>& vec) { insertionSort(vec); });
     measureFunc("Merge Sort", [&](vector<int>& vec) {
-        mergeSort(vec, 0, static_cast<int>(vec.size()) - 1);
+        mergeSort(vec, 0, static_cast<int>(vec.size()) - 1);  // Merge Sort uses low and high indices
         });
     measureFunc("Quick Sort", [&](vector<int>& vec) {
-        quickSort(vec, 0, static_cast<int>(vec.size()) - 1);
+        quickSort(vec, 0, static_cast<int>(vec.size()) - 1);  // Quick Sort uses low and high indices
         });
     measureFunc("Heap Sort", [&](vector<int>& vec) { heapSort(vec); });
     measureFunc("Radix Sort", [&](vector<int>& vec) { radixSort(vec); });
@@ -292,57 +339,61 @@ void SortingTimings::runAllSorts(){
     measureFunc("Bucket Sort", [&](vector<int>& vec) { bucketSort(vec); });
     measureFunc("Shell Sort", [&](vector<int>& vec) { shellSort(vec); });
 
-    auto endAll = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsedAll = endAll - startAll;
+    auto endAll = chrono::high_resolution_clock::now();  // Record the end time after all sorting algorithms finish
+    chrono::duration<double> elapsedAll = endAll - startAll;  // Calculate the total time taken for all sorts
 
-    cout << "All sorting algorithms together took: " << elapsedAll.count() << " seconds" << endl;
+    cout << "All sorting algorithms together took: " << elapsedAll.count() << " seconds" << endl;  // Output the total time
 }
 
 int SortingTimings::findMax(vector<int>& vec) {
-    return *max_element(vec.begin(), vec.end());
+    return *max_element(vec.begin(), vec.end()); //Returns the max value of the vec
 }
 
 void SortingTimings::measureFunc(const string& name, function<void(vector<int>&)> sortFunc) const {
-    vector<int> copyVec = vec; // Work on a copy of the vector
-    auto startTime = chrono::high_resolution_clock::now();
-    sortFunc(copyVec);
-    auto endTime = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsedTime = endTime - startTime;
-    cout << name << " took: " << elapsedTime.count() << " seconds\n" << endl;
+    vector<int> copyVec = vec;  // Create a copy of the original vector to avoid modifying the original
+    auto startTime = chrono::high_resolution_clock::now();  // Record the start time using high-resolution clock
+
+    sortFunc(copyVec);  // Call the sorting function passed as an argument, sorting the copied vector
+
+    auto endTime = chrono::high_resolution_clock::now();  // Record the end time after sorting is done
+    chrono::duration<double> elapsedTime = endTime - startTime;  // Calculate the time elapsed
+
+    cout << name << " took: " << elapsedTime.count() << " seconds\n" << endl;  // Output the elapsed time
 }
 
 void SortingTimings::fillVector() {
-    //random number generator
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dist(1, 500000); 
+    random_device rd;  // Obtain a random seed from the system's random device
+    mt19937 gen(rd()); // Mersenne Twister pseudo-random number generator, seeded with random_device
+    uniform_int_distribution<> dist(1, 500000); // Define a uniform distribution for random numbers between 1 and 500000
 
-    //fill the vector
+    // Fill the vector with random numbers
     for (size_t i = 0; i < 50000; ++i) {
-        vec[i] = dist(gen);
+        vec[i] = dist(gen);  // Assign a random value from the distribution to each element of the vector
     }
 }
 
 void SortingTimings::userInterface() {
-    bool continueRunning = true;
-    char choice2;
+    bool continueRunning = true;  // Flag to control the loop
+    char choice2;  
 
     while (continueRunning) {
-        fillVector();
-        displayMenu();
+        fillVector();  // Fill the vector with random numbers
+        displayMenu();  // Display the available sorting algorithms
 
         int choice;
-        cout << "Choose an algorithm to measure its time: ";
+        cout << "Choose an algorithm to measure its time: ";  // Prompt user for algorithm choice
         cin >> choice;
 
-        processChoice(choice);
+        processChoice(choice);  // Process the selected sorting algorithm
 
         cout << "Would you like to try again with a new size or algorithm? (y for yes, n for no): ";
         cin >> choice2;
 
+        // If the user chooses 'n', stop the loop
         if (choice2 == 'n') {
             continueRunning = false;
         }
+        // If the input is invalid, assume 'yes' and continue
         else if (choice2 != 'y') {
             cout << "Invalid input, assuming 'yes'." << endl;
         }
