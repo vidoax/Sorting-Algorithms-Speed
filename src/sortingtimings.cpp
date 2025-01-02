@@ -2,6 +2,7 @@
 #include <random>
 #include <chrono>
 #include <string>
+#include <cmath>
 #include "sortingtimings.h"
 using namespace std;
 
@@ -221,8 +222,105 @@ void SortingTimings::countingSort(vector<int>& vec) {
     }
 }
 
+void SortingTimings::bucketSort(vector<int>& vec) {
+    int maxVal = findMax(vec);
+    int n = vec.size();
+
+    int numBuckets = sqrt(n);              // Optimal number of buckets
+    int bucketRange = ceil((float)maxVal / numBuckets);
+
+    // Step 2: Create buckets
+    vector<vector<int>> buckets(numBuckets);
+
+    // Step 3: Scatter elements into buckets
+    for (int x : vec) {
+        int index = x / bucketRange;            // Determine bucket index
+        buckets[index].push_back(x);
+    }
+
+    // Step 4: Sort individual buckets
+    for (auto& bucket : buckets) {
+        sort(bucket.begin(), bucket.end());
+    }
+
+    // Step 5: Concatenate sorted buckets
+    int k = 0;
+    for (const auto& bucket : buckets) {
+        for (int x : bucket) {
+            vec[k++] = x;
+        }
+    }
+}
+
+void SortingTimings::shellSort(vector<int>& vec) {
+    int n = vec.size();
+
+    // Step 1: Initialize the gap
+    for (int gap = n / 2; gap > 0; gap /= 2) {
+        // Step 2: Perform gap-based insertion sort
+        for (int i = gap; i < n; ++i) {
+            int temp = vec[i];
+            int j = i;
+
+            // Compare and shift elements
+            while (j >= gap && vec[j - gap] > temp) {
+                vec[j] = vec[j - gap];
+                j -= gap;
+            }
+
+            // Place the temp element in its correct position
+            vec[j] = temp;
+        }
+    }
+}
+
+void SortingTimings::runAllSorts(){
+    auto startAll = chrono::high_resolution_clock::now();
+
+    measureFunc("Selection Sort", [&](vector<int>& vec) { selectionSort(vec); });
+    measureFunc("Bubble Sort", [&](vector<int>& vec) { bubbleSort(vec); });
+    measureFunc("Insertion Sort", [&](vector<int>& vec) { insertionSort(vec); });
+    measureFunc("Merge Sort", [&](vector<int>& vec) {
+        mergeSort(vec, 0, static_cast<int>(vec.size()) - 1);
+        });
+    measureFunc("Quick Sort", [&](vector<int>& vec) {
+        quickSort(vec, 0, static_cast<int>(vec.size()) - 1);
+        });
+    measureFunc("Heap Sort", [&](vector<int>& vec) { heapSort(vec); });
+    measureFunc("Radix Sort", [&](vector<int>& vec) { radixSort(vec); });
+    measureFunc("Counting Sort", [&](vector<int>& vec) { countingSort(vec); });
+    measureFunc("Bucket Sort", [&](vector<int>& vec) { bucketSort(vec); });
+    measureFunc("Shell Sort", [&](vector<int>& vec) { shellSort(vec); });
+
+    auto endAll = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsedAll = endAll - startAll;
+
+    cout << "All sorting algorithms together took: " << elapsedAll.count() << " seconds" << endl;
+}
+
 int SortingTimings::findMax(vector<int>& vec) {
     return *max_element(vec.begin(), vec.end());
+}
+
+void SortingTimings::measureFunc(const string& name, function<void(vector<int>&)> sortFunc) const {
+    vector<int> copyVec = vec; // Work on a copy of the vector
+    auto startTime = chrono::high_resolution_clock::now();
+    sortFunc(copyVec);
+    auto endTime = chrono::high_resolution_clock::now();
+    chrono::duration<double> elapsedTime = endTime - startTime;
+    cout << name << " took: " << elapsedTime.count() << " seconds\n" << endl;
+}
+
+void SortingTimings::fillVector() {
+    //random number generator
+    random_device rd;
+    mt19937 gen(rd());
+    uniform_int_distribution<> dist(1, 500000); 
+
+    //fill the vector
+    for (size_t i = 0; i < 50000; ++i) {
+        vec[i] = dist(gen);
+    }
 }
 
 void SortingTimings::userInterface() {
@@ -230,15 +328,7 @@ void SortingTimings::userInterface() {
     char choice2;
 
     while (continueRunning) {
-        size_t vectorSize;
-        cout << "Enter the amount of numbers to measure: ";
-        cin >> vectorSize;
-
-        fillVector(vectorSize);
-
-        cout << "Unsorted:" << endl;
-        displayVector(vec);
-
+        fillVector();
         displayMenu();
 
         int choice;
@@ -259,31 +349,6 @@ void SortingTimings::userInterface() {
     }
 }
 
-void SortingTimings::measureFunc(const string& name, function<void(vector<int>&)> sortFunc) const {
-    vector<int> copyVec = vec; // Work on a copy of the vector
-    auto startTime = chrono::high_resolution_clock::now();
-    sortFunc(copyVec);
-    auto endTime = chrono::high_resolution_clock::now();
-    chrono::duration<double> elapsedTime = endTime - startTime;
-    cout << name << " took: " << elapsedTime.count() << " seconds" << endl;
-    cout << "Sorted:" << endl;
-    displayVector(copyVec);
-}
-
-void SortingTimings::fillVector(size_t vSize) {
-    vec.resize(vSize); 
-
-    //random number generator
-    random_device rd;
-    mt19937 gen(rd());
-    uniform_int_distribution<> dist(1, 100); //random number between 1 and 100
-
-    //fill the vector
-    for (size_t i = 0; i < vec.size(); ++i) {
-        vec[i] = dist(gen); 
-    }
-}
-
 void SortingTimings::displayVector(const vector<int>& vec) const {
     for (const int& num : vec) {
         std::cout << num << " ";
@@ -298,7 +363,11 @@ void SortingTimings::displayMenu() const {
         << "4. Merge Sort\n"
         << "5. Quick Sort\n"
         << "6. Heap Sort\n"
-        << "7. Radix Sort\n";
+        << "7. Radix Sort\n"
+        << "8. Counting Sort\n"
+        << "9. Bucket Sort\n"
+        << "10. Shell Sort\n"
+        << "11. ALL AT ONCE\n";
 }
 
 void SortingTimings::processChoice(int choice) {
@@ -330,6 +399,15 @@ void SortingTimings::processChoice(int choice) {
         break;
     case 8:
         measureFunc("Counting Sort", [&](vector<int>& vec) { countingSort(vec); });
+        break;
+    case 9:
+        measureFunc("Bucket Sort", [&](vector<int>& vec) { bucketSort(vec); });
+        break;
+    case 10:
+        measureFunc("Shell Sort", [&](vector<int>& vec) { shellSort(vec); });
+        break;
+    case 11:
+        runAllSorts();
         break;
     default:
         cout << "Invalid choice, please try again." << endl;

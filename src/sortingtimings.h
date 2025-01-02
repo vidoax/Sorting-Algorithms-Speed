@@ -27,10 +27,13 @@ private:
     void radixSort(vector<int>& vec);
     void counting_sort_by_digit(vector<int>& vec, int exp);
     void countingSort(vector<int>& vec);
+    void bucketSort(vector<int>& vec);
+    void shellSort(vector<int>& vec);
+    void runAllSorts();
 
     // Utility methods
     int findMax(vector<int>& vec);
-    void fillVector(size_t vSize);
+    void fillVector();
     void measureFunc(const string& name, function<void(vector<int>&)> sortFunc) const;
     void userInterface();
     void displayVector(const vector<int>&vec) const;
@@ -38,7 +41,7 @@ private:
     void processChoice(int choice);
 
 public:
-    SortingTimings() = default; // Default constructor
+    SortingTimings() : vec(50000) {}; // Default constructor
     void run() {
         userInterface();
     }
