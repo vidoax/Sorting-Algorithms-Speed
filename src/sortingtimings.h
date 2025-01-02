@@ -1,20 +1,39 @@
 #ifndef SORTINGTIMINGS_H
 #define SORTINGTIMINGS_H
+
+#include <iostream>
 #include <vector>
+#include <string>
+#include <functional>
+#include <chrono>
+#include <cstdlib>
+#include <ctime>
 
 class SortingTimings {
 private:
-	std::vector<int> vec;
-	void selectionSort();
-	void bubbleSort();
-	void insertionSort();
+    std::vector<int> vec;
+
+    // Sorting methods
+    void selectionSort(std::vector<int>& vec);
+    void bubbleSort(std::vector<int>& vec);
+    void insertionSort(std::vector<int>& vec);
+    void merge(std::vector<int>& vec, int start, int mid, int end);
+    void mergeSort(std::vector<int>& vec, int start, int end);
+    void quickSort(std::vector<int>& vec);
+
+    // Utility methods
+    void fillVector(size_t vSize);
+    void measureFunc(const std::string& name, std::function<void(std::vector<int>&)> sortFunc) const;
+    void userInterface();
+    void displayVector(const std::vector<int>&vec) const;
+    void displayMenu() const;
+    void processChoice(int choice);
+
 public:
-    SortingTimings() {};
-	void fillVector(size_t vSize);
-	void userInterface();
-	void run() {
-		userInterface();
-	};
+    SortingTimings() = default; // Default constructor
+    void run() {
+        userInterface();
+    }
 };
 
-#endif // !SORTINGTIMINGS_H
+#endif // SORTINGTIMINGS_H
