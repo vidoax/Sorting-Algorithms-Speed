@@ -32,3 +32,7 @@
 *.app
 .vscode/c_cpp_properties.json
 /.vscode
+/.vs
+/build
+log.txt
+/out
