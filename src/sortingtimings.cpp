@@ -48,10 +48,10 @@ void SortingTimings::insertionSort(vector<int>& vec) {
         int j = i - 1;
 
         while (j >= 0 && vec[j] > key) {
-            vec[static_cast<std::vector<int, std::allocator<int>>::size_type>(j) + 1] = vec[j];
+            vec[static_cast<vector<int, allocator<int>>::size_type>(j) + 1] = vec[j];
             j = j - 1;
         }
-        vec[static_cast<std::vector<int, std::allocator<int>>::size_type>(j) + 1] = key;
+        vec[static_cast<vector<int, allocator<int>>::size_type>(j) + 1] = key;
     }
 }
 
@@ -85,6 +85,58 @@ void SortingTimings::selectionSort(vector<int>& vec) {
         if (minIndex != i) {
             swap(vec[i], vec[minIndex]);
         }
+    }
+}
+
+void SortingTimings::quickSort(vector<int>& vec, int low, int high) {
+    if (low < high) {
+        int pivot_index = q_partition(vec, low, high);
+        quickSort(vec, low, pivot_index - 1);
+        quickSort(vec, pivot_index + 1, high);
+    }
+}
+
+int SortingTimings::q_partition(vector<int>& vec, int low, int high) {
+    int pivot = vec[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; ++j) {
+        if (vec[j] <= pivot) {
+            i = i + 1;
+            swap(vec[i], vec[j]);
+        }
+    }
+    swap(vec[static_cast<vector<int, allocator<int>>::size_type>(i) + 1], vec[high]);
+
+    return i + 1;
+}
+
+void SortingTimings::heapSort(vector<int>& vec) {
+    int n = vec.size();
+
+    for (int i = n / 2 - 1; i >= 0; --i) {
+        heapify(vec, n, i);
+    }
+    for (int i = n - 1; i >= 1; --i) {
+        swap(vec[0], vec[i]);
+        heapify(vec, i, 0);
+    }
+}
+
+void SortingTimings::heapify(vector<int>& vec, int n, int i) {
+    int largest = i;
+    int left = 2 * i + 1;
+    int right = 2 * i + 2;
+
+    if(left < n && vec[left] > vec[largest]) {
+        largest = left;
+    }
+    if(right < n && vec[right] > vec[largest]) {
+        largest = right;
+    }
+    if (largest != i) {
+        swap(vec[i], vec[largest]);
+        heapify(vec, n, largest);
     }
 }
 
@@ -158,7 +210,9 @@ void SortingTimings::displayMenu() const {
     cout << "1. Selection Sort\n"
         << "2. Bubble Sort\n"
         << "3. Insertion Sort\n"
-        << "4. Merge Sort\n";
+        << "4. Merge Sort\n"
+        << "5. Quick Sort\n"
+        << "6. Heap Sort\n";
 }
 
 void SortingTimings::processChoice(int choice) {
@@ -176,6 +230,14 @@ void SortingTimings::processChoice(int choice) {
         measureFunc("Merge Sort", [&](vector<int>& vec) {
             mergeSort(vec, 0, static_cast<int>(vec.size()) - 1);
             });
+        break;
+    case 5:
+        measureFunc("Quick Sort", [&](vector<int>& vec) {
+            quickSort(vec, 0, static_cast<int>(vec.size()) - 1);
+            });
+        break;
+    case 6:
+        measureFunc("Heap Sort", [&](vector<int>& vec) { heapSort(vec); });
         break;
     default:
         cout << "Invalid choice, please try again." << endl;

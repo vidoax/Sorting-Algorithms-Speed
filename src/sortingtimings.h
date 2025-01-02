@@ -19,7 +19,10 @@ private:
     void insertionSort(std::vector<int>& vec);
     void merge(std::vector<int>& vec, int start, int mid, int end);
     void mergeSort(std::vector<int>& vec, int start, int end);
-    void quickSort(std::vector<int>& vec);
+    void quickSort(std::vector<int>& vec, int low, int high);
+    int q_partition(std::vector<int>& vec, int low, int high);
+    void heapSort(std::vector<int>& vec);
+    void heapify(std::vector<int>& vec, int n, int i);
 
     // Utility methods
     void fillVector(size_t vSize);
