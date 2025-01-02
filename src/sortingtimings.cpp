@@ -114,30 +114,115 @@ int SortingTimings::q_partition(vector<int>& vec, int low, int high) {
 void SortingTimings::heapSort(vector<int>& vec) {
     int n = vec.size();
 
+    // Build a Max-Heap
     for (int i = n / 2 - 1; i >= 0; --i) {
         heapify(vec, n, i);
     }
+
+    // Extract elements from the heap one by one
     for (int i = n - 1; i >= 1; --i) {
+        // Move current root to the end (extract max)
         swap(vec[0], vec[i]);
+
+        // Call heapify on the reduced heap
         heapify(vec, i, 0);
     }
 }
 
 void SortingTimings::heapify(vector<int>& vec, int n, int i) {
-    int largest = i;
-    int left = 2 * i + 1;
-    int right = 2 * i + 2;
+    int largest = i;           // Initialize largest as root
+    int left = 2 * i + 1;      // Left child index
+    int right = 2 * i + 2;     // Right child index
 
-    if(left < n && vec[left] > vec[largest]) {
+    // If the left child exists and is greater than the root
+    if (left < n && vec[left] > vec[largest]) {
         largest = left;
     }
-    if(right < n && vec[right] > vec[largest]) {
+
+    // If the right child exists and is greater than the largest so far
+    if (right < n && vec[right] > vec[largest]) {
         largest = right;
     }
+
+    // If the largest is not the root
     if (largest != i) {
         swap(vec[i], vec[largest]);
+
+        // Recursively heapify the affected subtree
         heapify(vec, n, largest);
     }
+}
+
+void SortingTimings::radixSort(vector<int>& vec) {
+    int max = findMax(vec);  // Find the maximum number in the array
+    int exp = 1;             // Start with the least significant digit (1's place)
+
+    // Process each digit (1's, 10's, 100's, etc.)
+    while (max / exp > 0) {
+        counting_sort_by_digit(vec, exp);
+        exp *= 10;  // Move to the next significant digit
+    }
+}
+
+void SortingTimings::counting_sort_by_digit(vector<int>& vec, int exp) {
+    int n = vec.size();
+    vector<int> output(n);    // Output array to store sorted numbers
+    vector<int> count(10, 0); // Count array for digits 0-9
+
+    // Count occurrences of each digit in the current digit place
+    for (int i = 0; i < n; ++i) {
+        int digit = (vec[i] / exp) % 10;
+        count[digit]++;
+    }
+
+    // Convert count[] to a prefix sum array
+    for (int i = 1; i < 10; ++i) {
+        count[i] += count[i - 1];
+    }
+
+    // Build the output array by placing numbers in the correct sorted order
+    for (int i = n - 1; i >= 0; --i) {
+        int digit = (vec[i] / exp) % 10;
+        output[count[digit] - 1] = vec[i];
+        count[digit]--;
+    }
+
+    // Copy the sorted numbers back into the original array
+    for (int i = 0; i < n; ++i) {
+        vec[i] = output[i];
+    }
+}
+
+void SortingTimings::countingSort(vector<int>& vec) {
+    int k = findMax(vec);      // Find maximum value in vec
+    int n = vec.size();        // Size of the input array
+    vector<int> C(k + 1, 0);   // Count array (size k+1)
+    vector<int> B(n);          // Output array
+
+    // Step 1: Count occurrences of each element
+    for (int i = 0; i < n; ++i) {
+        C[vec[i]]++;
+    }
+
+    // Step 2: Compute prefix sums in C[]
+    for (int i = 1; i <= k; ++i) {
+        C[i] += C[i - 1];
+    }
+
+    // Step 3: Place elements into sorted order (in reverse for stability)
+    for (int i = n - 1; i >= 0; --i) {
+        B[C[vec[i]] - 1] = vec[i];
+        C[vec[i]]--;
+    }
+
+    // Step 4: Copy sorted elements back into vec
+    for (int i = 0; i < n; ++i) {
+        vec[i] = B[i];
+    }
+}
+
+int SortingTimings::findMax(vector<int>& vec) {
+    return *max_element(vec.begin(), vec.end());
 }
 
 void SortingTimings::userInterface() {
@@ -212,7 +297,8 @@ void SortingTimings::displayMenu() const {
         << "3. Insertion Sort\n"
         << "4. Merge Sort\n"
         << "5. Quick Sort\n"
-        << "6. Heap Sort\n";
+        << "6. Heap Sort\n"
+        << "7. Radix Sort\n";
 }
 
 void SortingTimings::processChoice(int choice) {
@@ -238,6 +324,12 @@ void SortingTimings::processChoice(int choice) {
         break;
     case 6:
         measureFunc("Heap Sort", [&](vector<int>& vec) { heapSort(vec); });
+        break;
+    case 7:
+        measureFunc("Radix Sort", [&](vector<int>& vec) { radixSort(vec); });
+        break;
+    case 8:
+        measureFunc("Counting Sort", [&](vector<int>& vec) { countingSort(vec); });
         break;
     default:
         cout << "Invalid choice, please try again." << endl;
